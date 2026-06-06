@@ -110,3 +110,11 @@ coverage/
 .eslintcache
 .DS_Store
 *.tgz
+
+# Hardhat / Ethereum artifacts
+artifacts/
+cache/
+typechain/
+coverage/
+.openzeppelin/
+.hardhat/

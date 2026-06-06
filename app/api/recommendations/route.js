@@ -1,23 +1,17 @@
 import { NextResponse } from 'next/server';
+import { orchestrateRecommendation } from '../../../lib/agent.js';
 
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { marketId, walletAddress } = body || {};
+    const market = body.market || body;
 
-    // Minimal stubbed response — replace with real LLM + news pipeline
-    const recommendations = [
-      {
-        marketId: marketId || 'unknown',
-        recommendation: 'no-opinion',
-        confidence: 0.5,
-        rationale: 'This is a placeholder recommendation. Integrate Gemini + Firecrawl to generate real outputs.',
-        sources: [],
-      },
-    ];
+    if (!market) return NextResponse.json({ error: 'market required' }, { status: 400 });
 
-    return NextResponse.json({ recommendations, requestedBy: walletAddress ?? null });
+    const result = await orchestrateRecommendation({ market, userProfile: body.userProfile });
+    return NextResponse.json(result);
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json({ error: err?.message ?? String(err) }, { status: 500 });
   }
 }
+ 

@@ -42,8 +42,19 @@ export default function ForecastWidget({ walletAddress, onConnectClick }) {
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || "Failed to fetch market from Kalshi");
 
-      // data contains the curated {event, markets} object
-      setResult(data);
+      // data contains the curated market object
+      const market = data.market || data;
+
+      // Call recommendations orchestration
+      const recResp = await fetch('/api/recommendations', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ market })
+      });
+      const recJson = await recResp.json();
+      if (!recResp.ok) throw new Error(recJson.error || 'Recommendation orchestration failed');
+
+      setResult(recJson);
     } catch (err) {
       console.error(err);
       setError(err.message || "Unknown error");
@@ -104,7 +115,7 @@ export default function ForecastWidget({ walletAddress, onConnectClick }) {
 
   // ── Render ───────────────────────────────────────────────────────────
   return (
-    <div>
+    <div className="forecast-widget">
       <div className="widget-header">
         <h3>Forecast</h3>
         <p className="widget-sub">Request an evidence-backed forecast for a prediction market.</p>
@@ -113,7 +124,7 @@ export default function ForecastWidget({ walletAddress, onConnectClick }) {
       {/* ── Input form ─────────────────────────────────────────────── */}
       <form className="forecast-form" onSubmit={handleSubmit}>
         <label className="form-label">Market ID or Slug</label>
-        <div style={{display: 'flex', gap: 8}}>
+        <div className="input-row">
           <input
             className="form-input"
             placeholder="e.g. https://kalshi.com/markets/…"
@@ -206,9 +217,12 @@ export default function ForecastWidget({ walletAddress, onConnectClick }) {
       <style jsx>{`
         .widget-header h3 { font-size: 16px; margin: 0 0 6px 0; }
         .widget-sub { font-size: 12px; color: var(--text-secondary); margin: 0 0 12px 0; }
-        .forecast-form { display: flex; flex-direction: column; gap: 8px; }
-        .form-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; }
-        .form-input { flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); }
+        .forecast-widget { border: 2px solid rgba(255,255,255,0.95); border-radius: 12px; padding: 12px; color: #ffffff; }
+        .forecast-form { display: flex; flex-direction: column; gap: 8px; max-width: 640px; }
+        .form-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+        .input-row { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .form-input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.95); background: rgba(255,255,255,0.03); color: #ffffff; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.01); }
+        .form-input::placeholder { color: rgba(255,255,255,0.75); }
         .form-error { color: var(--color-danger); font-size: 13px; margin: 4px 0 0; }
         .text-muted { color: var(--text-muted); }
         .optional { font-weight: 400; color: var(--text-muted); }
@@ -228,6 +242,20 @@ export default function ForecastWidget({ walletAddress, onConnectClick }) {
           transition: all 0.2s;
         }
         .btn-feedback:hover { background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(168,85,247,0.3)); }
+        .btn-primary {
+          width: 100%;
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: none;
+          background: linear-gradient(90deg, #7c3aed 0%, #06b6d4 100%);
+          color: white;
+          font-weight: 700;
+          cursor: pointer;
+          box-shadow: 0 6px 18px rgba(12,12,50,0.35);
+          transition: transform 0.12s ease, opacity 0.12s ease;
+        }
+        .btn-primary:disabled { opacity: 0.6; cursor: default; transform: none; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); }
 
         /* Modal */
         .modal-overlay {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { buildCuratedResponse } from './curator.js';
+import { buildCuratedResponse } from '../curator.js';
 
 const KALSHI_BASE = 'https://external-api.kalshi.com/trade-api/v2/events';
 

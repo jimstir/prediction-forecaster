@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 
-const REPUTATION_ABI = [
-  "function giveFeedback(uint256 agentId, int128 value, uint8 valueDecimals, string tag1, string tag2, string endpoint, string feedbackURI, bytes32 feedbackHash) external",
-];
+import ERC8004_ABI from '../abis/ERC8004.json';
 
 export default function ForecastWidget({ walletAddress, onConnectClick }) {
   const [marketId, setMarketId] = useState("");
@@ -81,7 +79,8 @@ export default function ForecastWidget({ walletAddress, onConnectClick }) {
       const reputationAddress = process.env.NEXT_PUBLIC_REPUTATION_REGISTRY_ADDRESS;
       if (!reputationAddress) throw new Error("NEXT_PUBLIC_REPUTATION_REGISTRY_ADDRESS is not set.");
 
-      const contract = new ethers.Contract(reputationAddress, REPUTATION_ABI, signer);
+      // Use the ERC-8004 ABI file included in the project
+      const contract = new ethers.Contract(reputationAddress, ERC8004_ABI, signer);
 
       // Use the event / agent id from the forecast result
       const agentId = result?.agentId ?? 0;

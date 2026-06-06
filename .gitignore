@@ -1,3 +1,13 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon\r
+__MACOSX/
+
+# Environment files
+.env
+
 # Prerequisites
 *.d
 
@@ -67,3 +77,36 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Node / JavaScript
+node_modules/
+.next/
+out/
+dist/
+.parcel-cache/
+.turbo/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment local files
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+.env.example
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Coverage
+coverage/
+
+# Misc
+.eslintcache
+.DS_Store
+*.tgz

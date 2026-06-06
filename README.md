@@ -111,3 +111,43 @@ Open issues or PRs for bug fixes and feature requests. For questions about envir
 License
 
 MIT
+
+**Privy integration (wallet + auth)**
+
+- Frontend: this project includes dynamic Privy imports and a popup-based connect flow. To enable Privy UI features set `NEXT_PUBLIC_PRIVY_APP_ID` in your `.env` and configure your Privy app redirect/origins to `http://localhost:3000` (or your deployed origin).
+- Server-side: Privy server validation (if used) requires `PRIVY_CLIENT_ID` and `PRIVY_CLIENT_SECRET` in env. Implement server-side session verification at `POST /api/auth/privy` to validate popup callbacks and map Privy user -> wallet addresses.
+- UX: the Forecast Agent uses a backend-owned Agent Wallet for payments (x402). Users authenticate via Privy but do not sign the purchase transactions; the service pays for premium research on behalf of the user.
+
+**Deploying ERC-8004 / x402 on Base (recommended flow)**
+
+This project scaffolds a sample contract and Hardhat config. To deploy ERC-8004-style attestations and integrate x402 on Base, follow these steps:
+
+1. Configure env for Base:
+
+```
+ETH_RPC_URL=https://base-mainnet.rpc.url
+AGENT_WALLET_PRIVATE_KEY=your_agent_wallet_private_key
+```
+
+2. Install dependencies and compile contracts:
+
+```bash
+npm install
+npm run compile
+```
+
+3. Deploy with Hardhat (example):
+
+```bash
+npx hardhat run --network base scripts/deploy.js
+```
+
+4. After deployment, set `ERC8004_CONTRACT_ADDRESS` in your `.env` and use `POST /api/attestations` (to be implemented) to write attestations referencing `prompt_hash` and `model_id`.
+
+Notes & cautions
+
+- Gas & chain: Base is an EVM-compatible L2 — ensure your RPC and gas settings are appropriate. Use a funded deployer wallet.
+- x402 integration: x402 payment flows vary; if x402 supplies on-chain hooks, your backend can call their API and then publish a light on-chain receipt or attestation pointing to the purchase metadata.
+- Security: treat `AGENT_WALLET_PRIVATE_KEY` as highly sensitive. Use a secrets manager for production deployments and restrict access.
+
+If you want, I can add example Hardhat network config for Base and a deploy script that writes an ERC-8004-style attestation contract address into `.env.example`.
